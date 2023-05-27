@@ -1,15 +1,14 @@
-import React from 'react'
-import { Button, Card, Icon, Image } from 'semantic-ui-react'
-import { Activity } from '../../../App/Models/Activity'
+import { Button, Card, Image } from 'semantic-ui-react'
+import LoadingComponent from '../../../App/Layout/LoadingComponent';
+import { useStore } from '../../../App/stores/store';
 
-interface Props{
-    activity: Activity;
-    cancelSelectActivity : ()=>void;
-    openForm: (id:string)=> void;
 
-}
 
-export default function ActivtyDetails({activity, cancelSelectActivity, openForm}:Props) {
+export default function ActivtyDetails() {
+    const {activityStore} = useStore();
+    //Basically use the colon to rename function or property when destructring 
+    const {selectedActivity:activity,openForm,cancelSelectedActvity:cancelSelectActivity} = activityStore;
+if(!activity)return <LoadingComponent />;
   return (
     <Card>
         <Image src={`/assets/categoryImages/${activity.category}.jpg`}/>
