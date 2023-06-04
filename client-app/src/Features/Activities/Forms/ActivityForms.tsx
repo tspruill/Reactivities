@@ -1,14 +1,19 @@
 import { observer } from 'mobx-react-lite';
-import  { ChangeEvent, useState } from 'react'
+import  { ChangeEvent, useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Form, Segment } from 'semantic-ui-react'
+import LoadingComponent from '../../../App/Layout/LoadingComponent';
+import { Activity } from '../../../App/Models/Activity';
 import { useStore } from '../../../App/stores/store';
+import {v4 as uuid} from 'uuid';
 
 
 
 export default observer(function ActivityForms() {
   const {activityStore} = useStore();
-    const {selectedActivity, closeForm,createActivty,editActivty,loading} = activityStore
-  const intialState = selectedActivity ?? {
+  const {createActivty,editActivty,loading,loadActivitiy,loadingInitial} = activityStore
+  const {id} = useParams();
+  const [activity,setActivity] = useState<Activity>({
     id: '',
     title:'',
     description:'',
@@ -16,16 +21,27 @@ export default observer(function ActivityForms() {
     city:'',
     date:'',
     category:''
-  }
-  const [activity,setActivity] = useState(intialState);
+  });
+  const navigate = useNavigate();
+  useEffect(() => {
+    if(id) loadActivitiy(id).then( res => setActivity(res!))
+  },[id,loadActivitiy])
   function handleSubmit(){
-    activity.id ? editActivty(activity) : createActivty(activity); 
+    if(!activity.id)
+    {
+      activity.id = uuid()
+      createActivty(activity).then(() => navigate(`/activities/${activity.id}`))
+    }else{
+      editActivty(activity).then(() => navigate(`/activities/${activity.id}`))
+    }
+   
   }
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>){
     const {name,value} = event.target;
     setActivity({...activity,[name]:value})
 
   }
+  if(loadingInitial) return <LoadingComponent content='Loading Activtiy...'/>
 
   return (
     <Segment clearing>
@@ -37,7 +53,7 @@ export default observer(function ActivityForms() {
             <Form.Input placholder="City" value={activity.city} name='city' onChange={handleInputChange}/>
             <Form.Input placholder="Venue" value={activity.venue} name='venue' onChange={handleInputChange}/>
             <Button loading={loading}  floated='right'positive type='submit' content="Submit"/>
-            <Button onClick={closeForm} floated='right' type='button' content="Cancel"/>
+            <Button as={Link} to='/activities'  floated='right' type='button' content="Cancel"/>
 
 
 
@@ -47,3 +63,5 @@ export default observer(function ActivityForms() {
     </Segment>
   )
 })
+
+
