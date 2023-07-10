@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom/client';
+import 'react-calendar/dist/Calendar.css';
 import './App/Layout/styles.css';
 import 'semantic-ui-css/semantic.min.css';
 import reportWebVitals from './reportWebVitals';
